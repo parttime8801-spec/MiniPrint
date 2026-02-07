@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Print Web App</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1>Mini Print</h1>
+            <div id="status-indicator" class="status offline">
+                <span class="dot"></span> <span id="status-text">ยังไม่เชื่อมต่อ</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Connection Section -->
+            <section class="card connection-card">
+                <h2>เชื่อมต่อเครื่องพิมพ์</h2>
+                <p>เปิด Bluetooth ที่เครื่องพิมพ์แล้วกดปุ่มด้านล่าง</p>
+                <button id="connectBtn" class="btn primary-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                        <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                    </svg>
+                    ค้นหาและเชื่อมต่อ
+                </button>
+            </section>
+
+            <!-- File Upload Section -->
+            <section class="card upload-card">
+                <h2>เลือกรูปภาพบิล (PNG)</h2>
+                <div class="file-drop-area" id="dropZone">
+                    <span class="choose-file-button">เลือกไฟล์</span>
+                    <span class="file-message">หรือลากไฟล์มาวางที่นี่</span>
+                    <input class="file-input" type="file" id="fileInput" accept="image/png, image/jpeg">
+                </div>
+            </section>
+
+            <!-- Preview Section -->
+            <section class="preview-section" id="previewContainer" style="display: none;">
+                <h3>ตัวอย่างก่อนพิมพ์</h3>
+                <div class="preview-wrapper">
+                    <img id="imagePreview" alt="Bill Preview">
+                </div>
+                
+                <div class="controls">
+                    <label>ความเข้ม (Density): <span id="densityValue">127</span></label>
+                    <input type="range" id="densitySlider" min="0" max="255" value="127">
+                </div>
+
+                <div class="actions">
+                    <button id="printBtn" class="btn action-btn" disabled>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <rect x="6" y="14" width="12" height="8"></rect>
+                        </svg>
+                        พิมพ์ทันที
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="escpos.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
