@@ -19,7 +19,10 @@ let isPrinting = false;
 const SERVICE_UUIDS = [
     '000018f0-0000-1000-8000-00805f9b34fb', // Standard 16-bit UUID for Print Service
     'e7810a71-73ae-499d-8c15-faa9aef0c3f2', // Commonly used by 'MTP' or 'BlueTooth Printer'
-    '0000ffe0-0000-1000-8000-00805f9b34fb'  // HM-10 / JDY-08 often used in cheap modules
+    '0000ffe0-0000-1000-8000-00805f9b34fb',  // HM-10 / JDY-08 often used in cheap modules
+    '49535343-fe7d-4ae5-8fa9-9fafd205e455', // ISSC
+    '0000ff00-0000-1000-8000-00805f9b34fb', // Default Generic
+    '000018f1-0000-1000-8000-00805f9b34fb' // Generic Access
 ];
 
 // --- 1. Connection Logic ---
@@ -28,20 +31,11 @@ connectBtn.addEventListener('click', async () => {
     try {
         statusText.textContent = "กำลังค้นหา...";
 
-        // Request any device that advertises known services OR try generic access
-        // Note: For Android/Chrome, you often need to list all optional services you might want to access
+        // Request any device (acceptAllDevices) to ensure the printer shows up
+        // We must list all possible optionalServices to be able to talk to them later
         printerDevice = await navigator.bluetooth.requestDevice({
-            filters: [
-                { services: SERVICE_UUIDS }
-            ],
-            optionalServices: SERVICE_UUIDS // Crucial to access them later
-        }).catch(err => {
-            // Fallback: accept all devices if specific filters fail (User just has to pick carefully)
-            console.log("Filter failed, trying allow all...", err);
-            return navigator.bluetooth.requestDevice({
-                acceptAllDevices: true,
-                optionalServices: SERVICE_UUIDS
-            });
+            acceptAllDevices: true,
+            optionalServices: SERVICE_UUIDS
         });
 
         statusText.textContent = "กำลังเชื่อมต่อ...";
