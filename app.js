@@ -233,11 +233,20 @@ async function sendDataInChunks(data) {
     // we use a safe chunk size (e.g., 50-100 bytes) and a delay.
 
     // Determine optimal chunk size based on MTU if possible, but 128 is safe
-    const CHUNK_SIZE = 100;
+    // Determine optimal chunk size based on MTU if possible, but 128 is safe
+    let CHUNK_SIZE = 100;
+    let DELAY_MS = 50;
 
-    // Get speed from selector (default to 50ms if not found)
+    // Get speed from selector
     const speedSelect = document.getElementById('speedSelect');
-    const DELAY_MS = speedSelect ? parseInt(speedSelect.value, 10) : 50;
+    if (speedSelect) {
+        if (speedSelect.value === 'turbo') {
+            CHUNK_SIZE = 512; // Much bigger chunks for flow
+            DELAY_MS = 5;     // Almost no delay
+        } else {
+            DELAY_MS = parseInt(speedSelect.value, 10);
+        }
+    }
 
     // Prefer "Write Without Response" for image data as it's much faster (no ack required)
     const canWriteWithoutResponse = printerCharacteristic.properties.writeWithoutResponse;
