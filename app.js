@@ -241,8 +241,8 @@ async function sendDataInChunks(data) {
     const speedSelect = document.getElementById('speedSelect');
     if (speedSelect) {
         if (speedSelect.value === 'turbo') {
-            CHUNK_SIZE = 512; // Much bigger chunks for flow
-            DELAY_MS = 5;     // Almost no delay
+            CHUNK_SIZE = 100; // Safe size to prevent corrupt prints
+            DELAY_MS = 2;     // Minimum delay for speed
         } else {
             DELAY_MS = parseInt(speedSelect.value, 10);
         }
