@@ -134,8 +134,10 @@ function handleFileSelect(event) {
         const img = new Image();
         img.onload = () => {
             currentImage = img;
-            imagePreview.src = img.src;
             previewContainer.style.display = 'block';
+
+            // Initial Preview Render
+            updatePreview();
 
             if (printerCharacteristic) {
                 printBtn.disabled = false;
@@ -148,9 +150,39 @@ function handleFileSelect(event) {
 
 // --- 3. Printing Logic ---
 
+const autoTrimCheckbox = document.getElementById('autoTrim');
+const widthSelect = document.getElementById('widthSelect'); // Assuming widthSelect is defined elsewhere or will be added
+
+// Live Preview Update
+function updatePreview() {
+    if (!currentImage) return;
+
+    // Use a temp encoder just to generate the preview canvas
+    const tempEncoder = new EscPosEncoder();
+    const density = parseInt(densitySlider.value, 10);
+    const printWidth = parseInt(widthSelect.value, 10);
+    const autoTrim = autoTrimCheckbox.checked;
+
+    const result = tempEncoder.raster(currentImage, printWidth, density, autoTrim);
+
+    // Update the image element with the processed canvas
+    imagePreview.src = result.previewCanvas.toDataURL();
+
+    // Basic scaling for display comfort (optional)
+    imagePreview.style.width = '100%';
+    imagePreview.style.maxWidth = '300px'; // Limit max visual width
+}
+
+// Add listeners
 densitySlider.addEventListener('input', (e) => {
     densityValue.textContent = e.target.value;
+    // Debounce slightly if needed, but for small images it's fine
+    updatePreview();
 });
+
+widthSelect.addEventListener('change', updatePreview);
+autoTrimCheckbox.addEventListener('change', updatePreview);
+
 
 printBtn.addEventListener('click', async () => {
     if (!printerCharacteristic || !currentImage) return;
@@ -161,26 +193,20 @@ printBtn.addEventListener('click', async () => {
     try {
         const encoder = new EscPosEncoder();
 
-        // 1. Initialize
-        /* Not always needed and might print garbage on some cheap printers, 
-           but good for standard ones. 
-           Let's skip init for now to be safe with generic raw data 
-           or just rely on the image command. */
-        // encoder.initialize();
+        const density = parseInt(densitySlider.value, 10);
+        const printWidth = parseInt(widthSelect.value, 10);
+        const autoTrim = autoTrimCheckbox.checked;
 
         // 2. Raster Image
-        const density = parseInt(densitySlider.value, 10);
-        // Standard width for many 58mm POS printers is 384 dots.
-        // For higher res or 80mm it might be 576.
-        // We'll stick to 384 for "Mini Print" (usually 2 inches).
-        encoder.raster(currentImage, 384, density); // Width 384, Threshold from slider
+        // Note: raster() now returns { encoder, previewCanvas }
+        const result = encoder.raster(currentImage, printWidth, density, autoTrim);
 
-        // 3. Feed and Cut (if supported, mostly just feed)
+        // 3. Feed
         encoder.feed(4);
 
         const data = encoder.encode();
 
-        // 4. Send Data in Chunks
+        // 4. Send Data
         await sendDataInChunks(data);
 
         alert("ส่งคำสั่งพิมพ์เรียบร้อย!");
@@ -208,7 +234,7 @@ async function sendDataInChunks(data) {
 
     // Determine optimal chunk size based on MTU if possible, but 128 is safe
     const CHUNK_SIZE = 100;
-    const DELAY_MS = 20;
+    const DELAY_MS = 50; // Increased from 20ms to 50ms for stability
 
     // Prefer "Write Without Response" for image data as it's much faster (no ack required)
     const canWriteWithoutResponse = printerCharacteristic.properties.writeWithoutResponse;

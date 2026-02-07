@@ -56,6 +56,20 @@
                 <div class="controls">
                     <label>ความเข้ม (Density): <span id="densityValue">127</span></label>
                     <input type="range" id="densitySlider" min="0" max="255" value="127">
+
+                    <label style="margin-top: 10px;">ความกว้างกระดาษ (Width):</label>
+                    <select id="widthSelect" class="form-select"
+                        style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
+                        <option value="384" selected>ปกติ (384 dots / 58mm)</option>
+                        <option value="576">กว้าง (576 dots / 80mm)</option>
+                    </select>
+
+                    <label
+                        style="margin-top: 15px; display: flex; align-items: center; cursor: pointer; background: #f0f0f0; padding: 10px; border-radius: 8px;">
+                        <input type="checkbox" id="autoTrim" checked
+                            style="width: 20px; height: 20px; margin-right: 10px;">
+                        <span>ตัดขอบขาวอัตโนมัติ (แนะนำ)</span>
+                    </label>
                 </div>
 
                 <div class="actions">
